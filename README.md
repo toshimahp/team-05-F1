@@ -9,7 +9,7 @@ A backend for managing a Formula 1-style championship. Admins create organizers 
 | Member | Endpoints built |
 |:-------|:----------------|
 | **Toshimah** | A1 register, E1 create organizer, E2 create team, E3 get all teams, E4 get one team, E5 create championship |
-| **Sam** | A2 login, E11 schedule a race, E12 get races, E13 submit race results, E14 championship standings, E15 driver performance history |
+| **Samhita** | A2 login, E11 schedule a race, E12 get races, E13 submit race results, E14 championship standings, E15 driver performance history |
 | **Darsh** | A3 refresh token, E6 get all championships, E7 register driver profile, E8 apply to join a team, E9 accept or reject an application, E10 register a team for a championship |
 
 
