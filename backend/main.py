@@ -1,15 +1,20 @@
 from fastapi import FastAPI, HTTPException, Header
-import functions
+import function
 from fastapi.middleware.cors import CORSMiddleware
-from model import RegisterRequest, LoginRequest, FeedbackCreate
+
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174"],
+    allow_origins=["http://localhost:5173"],
     allow_methods=["*"],
     allow_headers=["*"]
 )
 
 ROLE= ["admin", "organizer" , "driver"]
+
+#E1 : create organizer account
+@app.post("/organizer_account")
+def create_organizer_account (username, password):
+    result = function.create_organizer_account(username=username, password=password)
