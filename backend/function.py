@@ -6,6 +6,8 @@ import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 import os
+from model import Championship, ChampionshipTeam, Driver, Race, RaceResult, Team
+from validation import POINTS_TABLE
 
 ph = PasswordHasher()
 
@@ -21,7 +23,7 @@ def create_organizer_account( user_id , username , password ):
         username = username,
         password  = password,
         role = "organizer" ,
-        created_at = datetime.date
+        created_at = datetime.now(timezone.utc)
     )
     
     session.add (organizer_account)
@@ -38,4 +40,134 @@ def create_organizer_account( user_id , username , password ):
     return data
 
 
-    
+# samhita functions (E11 - E15)
+# helper func turns a race row into a dictionary
+def race_to_dict(race):
+    return {
+        "race_id": race.race_id,
+        "championship_id": race.championship_id,
+        "name": race.name,
+        "circuit": race.circuit,
+        "country": race.country,
+        "round_number": race.round_number,
+        "race_date": race.race_date,
+        "status": race.status,
+        "results_published": race.results_published,
+    }
+
+# E11 schedules a race in a championship
+def schedule_race(championship_id, organizer_id, name, race_date, circuit="TBD", country="TBD"):
+    session = Session(engine)
+    championship = session.query(Championship).filter(Championship.champ_id == championship_id).first()
+    if championship is None:
+        session.close()
+        return "championship not found"
+    if championship.organizer_id != organizer_id:
+        session.close()
+        return "not your championship"
+    if championship.status == "completed":
+        session.close()
+        return "this championship season is completed, cannot schedule new races"
+
+    existing_races = session.query(Race).filter(Race.championship_id == championship_id).all()
+    round_number = len(existing_races) + 1
+
+    race = Race(
+        championship_id=championship_id,
+        name=name,
+        circuit=circuit,
+        country=country,
+        round_number=round_number,
+        race_date=race_date,
+    )
+    session.add(race)
+    session.commit()
+    session.refresh(race)
+    result = race_to_dict(race)
+    session.close()
+    return result
+
+
+# E12 gets all races of a championship
+def get_races(championship_id):
+    session = Session(engine)
+    championship = session.query(Championship).filter(Championship.champ_id == championship_id).first()
+    if championship is None:
+        session.close()
+        return "championship not found"
+
+    races = session.query(Race).filter(Race.championship_id == championship_id).order_by(Race.round_number).all()
+    result = []
+    for race in races:
+        result.append(race_to_dict(race))
+    session.close()
+    return result
+
+
+# E13 submits the results of a race
+def submit_results(race_id, organizer_id, results):
+    session = Session(engine)
+    race = session.query(Race).filter(Race.race_id == race_id).first()
+    if race is None:
+        session.close()
+        return "race not found"
+
+    championship = session.query(Championship).filter(Championship.champ_id == race.championship_id).first()
+    if championship.organizer_id != organizer_id:
+        session.close()
+        return "not your championship"
+    if race.results_published:
+        session.close()
+        return "results already published"
+
+    # shows the team ids registered for this championship
+    registered = session.query(ChampionshipTeam).filter(ChampionshipTeam.championship_id == race.championship_id).all()
+    registered_team_ids = []
+    for entry in registered:
+        registered_team_ids.append(entry.team_id)
+
+    # checks every driver first so nothing is saved if one of them is invalid
+    rows = []
+    for item in results:
+        driver = session.query(Driver).filter(Driver.driver_id == item.driver_id).first()
+        if driver is None:
+            session.close()
+            return "driver not found"
+        if driver.team_id is None:
+            session.close()
+            return "driver has no team"
+        if driver.team_id not in registered_team_ids:
+            session.close()
+            return "team not registered in championship"
+
+        points = POINTS_TABLE.get(item.position, 0)
+        rows.append(RaceResult(
+            race_id=race_id,
+            driver_id=driver.driver_id,
+            team_id=driver.team_id,
+            position=item.position,
+            points=points,
+            fastest_lap=item.fastest_lap,
+            fastest_lap_time=item.fastest_lap_time,
+        ))
+
+    for row in rows:
+        session.add(row)
+    race.results_published = True
+    race.status = "completed"
+    session.commit()
+
+    race_results = []
+    for row in rows:
+        race_results.append({
+            "result_id": row.result_id,
+            "race_id": row.race_id,
+            "driver_id": row.driver_id,
+            "team_id": row.team_id,
+            "position": row.position,
+            "points": row.points,
+            "fastest_lap": row.fastest_lap,
+            "fastest_lap_time": row.fastest_lap_time,
+        })
+    session.close()
+    return race_results
