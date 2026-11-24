@@ -6,13 +6,18 @@ A backend for managing a Formula 1-style championship. Admins create organizers 
 
 **Roles:** `admin`, `organizer` and `driver`. New registrations are drivers by default, and only admins can create organizer accounts.
 
-| Member | Endpoints built | Done/Not(✅) | A1/A2/A3 | E1/E11/E6 | E2/E12/E7 | E3/E13/E8 | E4/E14/E9 | E5/E15/E10 |
-|:-------|:----------------|:--------------|:---------|:----------|:----------|:----------|:----------|:-----------|
-| **Toshima** | A1 register, E1 create organizer, E2 create team, E3 get all teams, E4 get one team, E5 create championship | | | | | | | |
-| **Sam** | A2 login, E11 schedule a race, E12 get races, E13 submit race results, E14 championship standings, E15 driver performance history | | | | | | | |
-| **Darsh** | A3 refresh token, E6 get all championships, E7 register driver profile, E8 apply to join a team, E9 accept or reject an application, E10 register a team for a championship | | | | | | | |
+| Member | Endpoints built |
+|:-------|:----------------|
+| **Toshima** | A1 register, E1 create organizer, E2 create team, E3 get all teams, E4 get one team, E5 create championship |
+| **Sam** | A2 login, E11 schedule a race, E12 get races, E13 submit race results, E14 championship standings, E15 driver performance history |
+| **Darsh** | A3 refresh token, E6 get all championships, E7 register driver profile, E8 apply to join a team, E9 accept or reject an application, E10 register a team for a championship |
 
-**Status:** not started yet. Update this line as the endpoints are finished.
+
+| Done/Not(✅) | A1/A2/A3 | E1/E11/E6 | E2/E12/E7 | E3/E13/E8 | E4/E14/E9 | E5/E15/E10 |
+|:--------------|:---------|:----------|:----------|:----------|:----------|:-----------|
+| **Toshima** | | | | | | |
+| **Samhita** | | | | | | |
+| **Darsh** | | | | | | |
 
 ## 2. Live app
 
