@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Header, Body
 import function
 from validation import (
-    DriverCreate, TeamApplicationCreate, 
+    DriverCreate, RaceCreate, RaceResultsSubmit, TeamApplicationCreate, 
     ApplicationDecision, TeamRegisterRequest, 
     OrganizerCreate, ChampionshipCreate, TeamCreate, 
     LoginRequest, RegisterRequest)
@@ -55,7 +55,6 @@ def refresh(refresh_token: str = Header(None)):
     return {"access_token": access_token}
 
 #E1 - E5
-
 #E1 : create organizer account
 @app.post("/organizer_account")
 def create_organizer_account (account:OrganizerCreate):
@@ -87,7 +86,6 @@ def Championship (account:ChampionshipCreate, organizer_id: int = Header()):
 def list_championships():
     return function.get_championships()
 
-
 # E7 registers a driver profile (driver only)
 @app.post("/drivers", status_code=201)
 def create_driver(creds: DriverCreate, token: str = Header(None)):
@@ -100,7 +98,6 @@ def create_driver(creds: DriverCreate, token: str = Header(None)):
         "car number already taken": 409,
     })
     return result
-
 
 # E8 a driver applies to join a team
 @app.post("/applications", status_code=201)
@@ -115,7 +112,6 @@ def apply_for_team(creds: TeamApplicationCreate, token: str = Header(None)):
     })
     return result
 
-
 # E9 the team manager accepts or rejects an application
 @app.patch("/applications/{application_id}")
 def decide_on_application(application_id: int, creds: ApplicationDecision, token: str = Header(None)):
@@ -129,7 +125,6 @@ def decide_on_application(application_id: int, creds: ApplicationDecision, token
         "driver is already in a team": 409,
     })
     return result
-
 
 # E10 the team manager registers a team for a championship
 @app.post("/championships/{championship_id}/teams", status_code=201)
@@ -147,3 +142,36 @@ def register_team_in_championship(championship_id: int, creds: TeamRegisterReque
 
 
 # E11 - E15 (Sam)
+# E11 schedules a race in a championship (organizer only)
+@app.post("/championships/{championship_id}/races", status_code=201)
+def schedule_new_race(championship_id: int, creds: RaceCreate, token: str = Header(None)):
+    user = authorize(token, ["organizer"])
+    result = function.schedule_race(championship_id, user["user_id"], creds.name, creds.race_date, creds.circuit, creds.country)
+    check_error(result, {
+        "championship not found": 404,
+        "not your championship": 403,
+        "this championship season is completed, cannot schedule new races": 400,
+    })
+    return result
+
+# E12 gets all races of a championship
+@app.get("/championships/{championship_id}/races")
+def list_races(championship_id: int):
+    result = function.get_races(championship_id)
+    check_error(result, {"championship not found": 404})
+    return result
+
+# E13 submits the results of a race (organizer only)
+@app.post("/races/{race_id}/results", status_code=201)
+def publish_race_results(race_id: int, creds: RaceResultsSubmit, token: str = Header(None)):
+    user = authorize(token, ["organizer"])
+    result = function.submit_results(race_id, user["user_id"], creds.results)
+    check_error(result, {
+        "race not found": 404,
+        "driver not found": 404,
+        "not your championship": 403,
+        "results already published": 400,
+        "driver has no team": 400,
+        "team not registered in championship": 400,
+    })
+    return result

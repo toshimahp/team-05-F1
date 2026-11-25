@@ -156,10 +156,9 @@ class ApplicationDecision(BaseModel):
 # races
 class RaceCreate(BaseModel):
     name: str
-    circuit: str
-    country: str
-    round_number: int
     race_date: date
+    circuit: str = "TBD"
+    country: str = "TBD"
 
     @field_validator("name", "circuit", "country")
     def not_empty(cls, v):
