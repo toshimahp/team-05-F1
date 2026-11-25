@@ -167,12 +167,6 @@ class RaceCreate(BaseModel):
             raise ValueError("field cannot be empty")
         return v
 
-    @field_validator("round_number")
-    def check_round(cls, v):
-        if v < 1:
-            raise ValueError("round_number must be at least 1")
-        return v
-
 
 class RaceResponse(BaseModel):
     race_id: int
