@@ -199,6 +199,44 @@ def decide_application(user_id, application_id, status):
     return data
 
 
+# E10 the team manager registers a team for a championship
+def register_team_for_championship(user_id, championship_id, team_id):
+    session = Session(engine)
+
+    championship = session.get(Championship, championship_id)
+    if championship is None:
+        session.close()
+        return "championship not found"
+
+    team = session.get(Team, team_id)
+    if team is None:
+        session.close()
+        return "team not found"
+
+    if team.manager_id != user_id:
+        session.close()
+        return "not your team"
+
+    if championship.status == "completed":
+        session.close()
+        return "championship is completed"
+
+    for row in session.query(ChampionshipTeam):
+        if row.championship_id == championship_id and row.team_id == team_id:
+            session.close()
+            return "team already registered"
+
+    entry = ChampionshipTeam(championship_id=championship_id, team_id=team_id)
+    session.add(entry)
+    session.commit()
+    data = {
+        "champ_team_id": entry.champ_team_id,
+        "championship_id": entry.championship_id,
+        "team_id": entry.team_id,
+        "registered_at": entry.registered_at,
+    }
+    session.close()
+    return data
 
 
 
