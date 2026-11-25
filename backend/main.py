@@ -175,3 +175,17 @@ def publish_race_results(race_id: int, creds: RaceResultsSubmit, token: str = He
         "team not registered in championship": 400,
     })
     return result
+
+# E14 gets the standings of a championship
+@app.get("/championships/{championship_id}/standings")
+def championship_standings(championship_id: int):
+    result = function.get_standings(championship_id)
+    check_error(result, {"championship not found": 404})
+    return result
+
+# E15 gets the performance history of a driver
+@app.get("/drivers/{driver_id}/history")
+def driver_history(driver_id: int):
+    result = function.get_driver_history(driver_id)
+    check_error(result, {"driver not found": 404})
+    return result
