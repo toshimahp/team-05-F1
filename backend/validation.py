@@ -5,6 +5,29 @@ from pydantic import BaseModel, field_validator, model_validator
 # points table from the prd
 POINTS_TABLE = {1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1}
 
+# user authentication
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+    
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    role: str
+
+    @field_validator("username")
+    def check_username(cls, v):
+        v = v.strip()
+        if len(v) < 3:
+            raise ValueError("username must be at least 3 characters")
+        return v
+
+    @field_validator("password")
+    def check_password(cls, v):
+        if len(v) < 5:
+            raise ValueError("password must be at least 5 characters")
+        return v
+
 # admin + teams 
 class OrganizerCreate(BaseModel):
     username: str
@@ -19,8 +42,8 @@ class OrganizerCreate(BaseModel):
 
     @field_validator("password")
     def check_password(cls, v):
-        if len(v) < 6:
-            raise ValueError("password must be at least 6 characters")
+        if len(v) < 5:
+            raise ValueError("password must be at least 5 characters")
         return v
 
 

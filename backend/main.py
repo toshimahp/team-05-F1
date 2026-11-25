@@ -1,17 +1,12 @@
-from fastapi import FastAPI, HTTPException, Header
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Header, Body
 import function
-from validation import DriverCreate, TeamApplicationCreate, ApplicationDecision, TeamRegisterRequest, OrganizerCreate, ChampionshipCreate, TeamCreate
+from validation import (
+    DriverCreate, TeamApplicationCreate, 
+    ApplicationDecision, TeamRegisterRequest, 
+    OrganizerCreate, ChampionshipCreate, TeamCreate, 
+    LoginRequest, RegisterRequest)
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-
 ROLE = ["admin", "organizer", "driver"]
 
 
@@ -35,13 +30,18 @@ def check_error(result, codes):
 
 # A1 register endpoint
 @app.post("/register")
-def register_user(username, password, role):
-    if function.register_user(username=username, password=password, role=role):
+def register_user(creds: RegisterRequest):
+    if function.register_user(username=creds.username, password=creds.password, role="driver"):
         return {"message": "user registered successfully"}
     raise HTTPException(status_code=409, detail="user already exists")
 
 
-# A2
+# A2 logs in and gives access and refresh tokens
+@app.post("/auth/login")
+def login(creds: LoginRequest):
+    result = function.login_user(creds.username, creds.password)
+    check_error(result, {"invalid username or password": 401})
+    return result
 
 
 # A3 gives a new access token from a refresh token

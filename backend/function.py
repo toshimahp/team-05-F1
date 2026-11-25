@@ -14,6 +14,10 @@ ph = PasswordHasher()
 DB_URL = os.getenv("DB_URL", "sqlite:///F1.db")
 engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
+SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRY = 15
+REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 
 
 
 #E1 :function for creation of organizer acount
@@ -465,6 +469,8 @@ def submit_results(race_id, organizer_id, results):
     session.close()
     return race_results
 
+
+# A1 registering a new user
 def register_user(username, password, role):
     session = Session(engine)
     user_exist = session.query(User).filter_by(username =username).first()
@@ -482,3 +488,42 @@ def register_user(username, password, role):
     session.commit()
     session.close()
     return True
+
+# A2 login
+# create token function
+def create_token(user_id, role, username, token_type):
+    time = ACCESS_TOKEN_EXPIRY 
+    if token_type == "refresh":
+        time = REFRESH_TOKEN_EXPIRY
+    payload = {
+        "user_id": user_id,
+        "role": role,
+        "username": username,
+        "token_type": token_type,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=time),
+    }
+    token = jwt.encode(payload=payload, key=SECRET_KEY, algorithm=ALGORITHM)
+    return token
+
+# A2 checks the username and password and gives access and refresh tokens
+def login_user(username, password):
+    session = Session(engine)
+    user = session.query(User).filter(User.username == username).first()
+    if user is None:
+        session.close()
+        return "invalid username or password"
+
+    try:
+        ph.verify(user.password, password)
+    except Exception:
+        session.close()
+        return "invalid username or password"
+
+    user_id = user.user_id
+    role = user.role
+    session.close()
+
+    return {
+        "access_token": create_token(user_id, role, username, "access"),
+        "refresh_token": create_token(user_id, role, username, "refresh"),
+    }
