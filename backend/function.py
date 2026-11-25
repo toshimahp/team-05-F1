@@ -469,6 +469,145 @@ def submit_results(race_id, organizer_id, results):
     session.close()
     return race_results
 
+# helper for sorting standings, more points first then more wins
+def standing_key(entry):
+    return (-entry["points"], -entry["wins"])
+
+# E14 gets the standings of a championship from published results
+def get_standings(championship_id):
+    session = Session(engine)
+    championship = session.query(Championship).filter(Championship.champ_id == championship_id).first()
+    if championship is None:
+        session.close()
+        return "championship not found"
+
+    races = session.query(Race).filter(Race.championship_id == championship_id, Race.results_published == True).all()
+
+    driver_points = {}
+    driver_wins = {}
+    driver_team = {}
+    team_points = {}
+    team_wins = {}
+
+    # every registered team shows up even with 0 points
+    registered = session.query(ChampionshipTeam).filter(ChampionshipTeam.championship_id == championship_id).all()
+    for entry in registered:
+        team_points[entry.team_id] = 0
+        team_wins[entry.team_id] = 0
+
+    # adds up the points race by race
+    for race in races:
+        race_results = session.query(RaceResult).filter(RaceResult.race_id == race.race_id).all()
+        for result in race_results:
+            if result.driver_id not in driver_points:
+                driver_points[result.driver_id] = 0
+                driver_wins[result.driver_id] = 0
+            if result.team_id not in team_points:
+                team_points[result.team_id] = 0
+                team_wins[result.team_id] = 0
+
+            driver_points[result.driver_id] += result.points
+            team_points[result.team_id] += result.points
+            driver_team[result.driver_id] = result.team_id
+            if result.position == 1:
+                driver_wins[result.driver_id] += 1
+                team_wins[result.team_id] += 1
+
+    # driver standings
+    driver_entries = []
+    for driver_id in driver_points:
+        driver = session.query(Driver).filter(Driver.driver_id == driver_id).first()
+        driver_entries.append({
+            "driver_id": driver_id,
+            "full_name": driver.full_name,
+            "team_id": driver_team[driver_id],
+            "points": driver_points[driver_id],
+            "wins": driver_wins[driver_id],
+        })
+    driver_entries.sort(key=standing_key)
+
+    driver_standings = []
+    place = 1
+    for entry in driver_entries:
+        driver_standings.append({
+            "position": place,
+            "driver_id": entry["driver_id"],
+            "full_name": entry["full_name"],
+            "team_id": entry["team_id"],
+            "points": entry["points"],
+        })
+        place += 1
+
+    # team standings
+    team_entries = []
+    for team_id in team_points:
+        team = session.query(Team).filter(Team.team_id == team_id).first()
+        team_entries.append({
+            "team_id": team_id,
+            "team_name": team.name,
+            "points": team_points[team_id],
+            "wins": team_wins[team_id],
+        })
+    team_entries.sort(key=standing_key)
+
+    team_standings = []
+    place = 1
+    for entry in team_entries:
+        team_standings.append({
+            "position": place,
+            "team_id": entry["team_id"],
+            "team_name": entry["team_name"],
+            "points": entry["points"],
+        })
+        place += 1
+
+    session.close()
+    return {
+        "championship_id": championship_id,
+        "driver_standings": driver_standings,
+        "team_standings": team_standings,
+    }
+
+
+# helper for sorting history by race date
+def history_key(entry):
+    return entry["race_date"]
+
+# E15 gets the performance history of a driver
+def get_driver_history(driver_id):
+    session = Session(engine)
+    driver = session.query(Driver).filter(Driver.driver_id == driver_id).first()
+    if driver is None:
+        session.close()
+        return "driver not found"
+
+    results = session.query(RaceResult).filter(RaceResult.driver_id == driver_id).all()
+    history = []
+    total_points = 0
+    for result in results:
+        race = session.query(Race).filter(Race.race_id == result.race_id).first()
+        history.append({
+            "race_id": race.race_id,
+            "race_name": race.name,
+            "round_number": race.round_number,
+            "championship_id": race.championship_id,
+            "race_date": race.race_date,
+            "team_id": result.team_id,
+            "position": result.position,
+            "points": result.points,
+            "fastest_lap": result.fastest_lap,
+        })
+        total_points += result.points
+    history.sort(key=history_key)
+
+    session.close()
+    return {
+        "driver_id": driver_id,
+        "full_name": driver.full_name,
+        "total_points": total_points,
+        "history": history,
+    }
+
 
 # A1 registering a new user
 def register_user(username, password, role):
