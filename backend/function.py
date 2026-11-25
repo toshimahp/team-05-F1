@@ -18,10 +18,9 @@ Base.metadata.create_all(engine)
 
 
 #E1 :function for creation of organizer acount
-def create_organizer_account( user_id , username , password ):
+def create_organizer_account( username , password ):
     session = Session (engine)
     organizer_account = User (
-        user_id = user_id,
         username = username,
         password  = password,
         role = "organizer" ,
@@ -42,14 +41,13 @@ def create_organizer_account( user_id , username , password ):
     return data
 
 #E2 : function for creation of racing team
-def create_racing_team( team_id , name , country,manager_id, max_deivers ):
+def create_racing_team( name , country,manager_id, max_drivers ):
     session = Session (engine)
     racing_team = Team (
-        team_id = team_id,
         name = name,
         country = country,
         manager_id = manager_id ,
-        max_drivers = max_deivers,
+        max_drivers = max_drivers,
         created_at = datetime.now()
     )
     
@@ -57,12 +55,12 @@ def create_racing_team( team_id , name , country,manager_id, max_deivers ):
     session.commit()
     
     data = {
-        "team_id" : team_id,
+        "team_id" : racing_team.team_id,
         "name" : name,
         "country" : country,
         "manager_id" : manager_id ,
-        "max_drivers" : max_deivers,
-        "created_at" : datetime.date
+        "max_drivers" : max_drivers,
+        "created_at" : racing_team.created_at
     }
     session.close()
     return data
@@ -80,7 +78,7 @@ def get_racing_team ():
             "name" : race_team.name,
             "country" : race_team.country,
             "manager_id" : race_team.manager_id ,
-            "max_drivers" : race_team.max_deivers,
+            "max_drivers" : race_team.max_drivers,
             "created_at" : race_team.created_at
         })
         
@@ -100,7 +98,7 @@ def get_racing_team_by_id (team_id):
             "name" : race_team.name,
             "country" : race_team.country,
             "manager_id" : race_team.manager_id ,
-            "max_drivers" : race_team.max_deivers,
+            "max_drivers" : race_team.max_drivers,
             "created_at" : race_team.created_at
         })
         
@@ -109,15 +107,14 @@ def get_racing_team_by_id (team_id):
     
     
 #E5 : create a championship
-def create_championship(champ_id, name, season, organizer_id, status):
+def create_championship( name, season, organizer_id, start_date, end_date, status = "upcoming"):
     session = Session(engine)
     championship =  Championship(
-            champ_id = champ_id , 
             name = name,
             season = season,
             organizer_id = organizer_id, 
-            start_date = datetime.date,
-            end_date = datetime.date,
+            start_date = start_date,
+            end_date = end_date,
             status = status , # upcoming / ongoing / completed
             created_at = datetime.now()
         )
@@ -133,7 +130,7 @@ def create_championship(champ_id, name, season, organizer_id, status):
         "start_date" : championship.start_date,
         "end_date" : championship.end_date, 
         "status" : championship.status , # upcoming / ongoing / completed
-        "created_at" : championship.creates_at
+        "created_at" : championship.created_at
     }
     session.close()
     return data
