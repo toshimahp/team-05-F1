@@ -15,6 +15,14 @@ app.add_middleware(
 
 ROLE= ["admin", "organizer" , "driver"]
 
+# register endpoint
+@app.post("/register")
+def register_user(username, password, role):
+    if function.register_user(username=username, password=password, role=role):
+        return {"message": "user registered successfully"}
+    raise HTTPException(status_code=409, detail="user already exists")
+
+
 #E1 - E5
 
 #E1 : create organizer account

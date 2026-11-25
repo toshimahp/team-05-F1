@@ -465,3 +465,21 @@ def submit_results(race_id, organizer_id, results):
         })
     session.close()
     return race_results
+
+def register_user(username, password, role):
+    session = Session(engine)
+    user_exist = session.query(User).filter_by(username =username).first()
+    if user_exist is not None:
+        session.close()
+        return False
+    
+    try:
+        hashed_password = ph.hash(password)
+    except Exception:
+        session.close()
+        return False
+    
+    session.add(User(username= username, password= hashed_password, role= role))
+    session.commit()
+    session.close()
+    return True
