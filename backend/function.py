@@ -333,7 +333,7 @@ def register_team_for_championship(user_id, championship_id, team_id):
 
 
 
-# samhita functions (E11 - E15)
+# samhita function (E11 - E15)
 # helper func turns a race row into a dictionary
 def race_to_dict(race):
     return {
