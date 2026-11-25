@@ -1,13 +1,14 @@
 from sqlalchemy import create_engine
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
-from model import Base, Feedback , User
+from model import Base, User
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 import os
-from model import Championship, ChampionshipTeam, Driver, Race, RaceResult, Team
+from model import Championship, ChampionshipTeam, Driver, Race, RaceResult, Team, TeamApplication
 from validation import POINTS_TABLE
+
 
 ph = PasswordHasher()
 
@@ -38,6 +39,11 @@ def create_organizer_account( user_id , username , password ):
     }
     session.close()
     return data
+
+#1 - E5
+
+
+# E6 - E10
 
 
 # samhita functions (E11 - E15)

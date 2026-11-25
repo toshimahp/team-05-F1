@@ -14,7 +14,15 @@ app.add_middleware(
 
 ROLE= ["admin", "organizer" , "driver"]
 
+#E1 - E5
+
 #E1 : create organizer account
 @app.post("/organizer_account")
 def create_organizer_account (username, password):
     result = function.create_organizer_account(username=username, password=password)
+    
+#E6 - E10
+
+
+
+#E11 - E15
