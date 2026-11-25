@@ -666,3 +666,37 @@ def login_user(username, password):
         "access_token": create_token(user_id, role, username, "access"),
         "refresh_token": create_token(user_id, role, username, "refresh"),
     }
+    
+    
+    
+# A3 checks a token and returns what is inside it, or None if it is bad
+def verify_token(token, token_type):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except Exception:
+        return None
+
+    if payload["token_type"] != token_type:
+        return None
+    return payload
+
+
+# A3 takes a refresh token and gives back a new access token string
+def refresh_access_token(refresh_token):
+    payload = verify_token(refresh_token, "refresh")
+    if payload is None:
+        return None
+
+    # checks that the user still exists in the database
+    session = Session(engine)
+    user = session.query(User).filter(User.user_id == payload["user_id"]).first()
+    if user is None:
+        session.close()
+        return None
+
+    user_id = user.user_id
+    role = user.role
+    username = user.username
+    session.close()
+
+    return create_token(user_id, role, username, "access")
