@@ -81,6 +81,15 @@ def application_to_dict(application):
         "applied_at": application.applied_at,
         "reviewed_at": application.reviewed_at,
     }
+    
+# E6 gets all championships
+def get_championships():
+    session = Session(engine)
+    result = []
+    for championship in session.query(Championship):
+        result.append(championship_to_dict(championship))
+    session.close()
+    return result
 
 
 
