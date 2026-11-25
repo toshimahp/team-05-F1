@@ -16,14 +16,14 @@ engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
 
 
-def create_organizer_account( user_id , username , password ):
+#E1 :function for creation of organizer acount
+def create_organizer_account( username , password ):
     session = Session (engine)
     organizer_account = User (
-        user_id = user_id,
         username = username,
         password  = password,
         role = "organizer" ,
-        created_at = datetime.now(timezone.utc)
+        created_at = datetime.now()
     )
     
     session.add (organizer_account)
@@ -39,7 +39,101 @@ def create_organizer_account( user_id , username , password ):
     session.close()
     return data
 
-#1 - E5
+#E2 : function for creation of racing team
+def create_racing_team( name , country,manager_id, max_drivers ):
+    session = Session (engine)
+    racing_team = Team (
+        name = name,
+        country = country,
+        manager_id = manager_id ,
+        max_drivers = max_drivers,
+        created_at = datetime.now()
+    )
+    
+    session.add (racing_team)
+    session.commit()
+    
+    data = {
+        "team_id" : racing_team.team_id,
+        "name" : name,
+        "country" : country,
+        "manager_id" : manager_id ,
+        "max_drivers" : max_drivers,
+        "created_at" : racing_team.created_at
+    }
+    session.close()
+    return data
+
+   
+#E3 : geting all racing team
+def get_racing_team ():
+    session = Session(engine)
+    racing_team = session.query(Team).all()
+    
+    data = []
+    for race_team in racing_team:
+        data.append ({
+            "team_id" : race_team.team_id,
+            "name" : race_team.name,
+            "country" : race_team.country,
+            "manager_id" : race_team.manager_id ,
+            "max_drivers" : race_team.max_drivers,
+            "created_at" : race_team.created_at
+        })
+        
+    session.close()
+    return data
+
+
+#E4 : geting details of particular team through team_id
+def get_racing_team_by_id (team_id):
+    session = Session(engine)
+    racing_team = session.query(Team).filter(Team.team_id == team_id).all()
+    
+    data = []
+    for race_team in racing_team:
+        data.append ({
+            "team_id" : race_team.team_id,
+            "name" : race_team.name,
+            "country" : race_team.country,
+            "manager_id" : race_team.manager_id ,
+            "max_drivers" : race_team.max_drivers,
+            "created_at" : race_team.created_at
+        })
+        
+    session.close()
+    return data
+    
+    
+#E5 : create a championship
+def create_championship( name, season, organizer_id, start_date, end_date, status = "upcoming"):
+    session = Session(engine)
+    championship =  Championship(
+            name = name,
+            season = season,
+            organizer_id = organizer_id, 
+            start_date = start_date,
+            end_date = end_date,
+            status = status , # upcoming / ongoing / completed
+            created_at = datetime.now()
+        )
+        
+    session.add (championship)
+    session.commit()
+    
+    data = {
+        "champ_id" : championship.champ_id , 
+        "name" : championship.name,
+        "season" :  championship.season,
+        "organizer_id" : championship.organizer_id, 
+        "start_date" : championship.start_date,
+        "end_date" : championship.end_date, 
+        "status" : championship.status , # upcoming / ongoing / completed
+        "created_at" : championship.created_at
+    }
+    session.close()
+    return data
+
 
 
 # E6 - E10
@@ -370,3 +464,21 @@ def submit_results(race_id, organizer_id, results):
         })
     session.close()
     return race_results
+
+def register_user(username, password, role):
+    session = Session(engine)
+    user_exist = session.query(User).filter_by(username =username).first()
+    if user_exist is not None:
+        session.close()
+        return False
+    
+    try:
+        hashed_password = ph.hash(password)
+    except Exception:
+        session.close()
+        return False
+    
+    session.add(User(username= username, password= hashed_password, role= role))
+    session.commit()
+    session.close()
+    return True
