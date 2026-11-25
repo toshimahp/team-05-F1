@@ -44,6 +44,45 @@ def create_organizer_account( user_id , username , password ):
 
 
 # E6 - E10
+# helper turns a championship row into a dictionary
+def championship_to_dict(championship):
+    return {
+        "champ_id": championship.champ_id,
+        "name": championship.name,
+        "season": championship.season,
+        "organizer_id": championship.organizer_id,
+        "start_date": championship.start_date,
+        "end_date": championship.end_date,
+        "status": championship.status,
+    }
+
+
+# helper turns a driver row into a dictionary
+def driver_to_dict(driver):
+    return {
+        "driver_id": driver.driver_id,
+        "user_id": driver.user_id,
+        "full_name": driver.full_name,
+        "car_number": driver.car_number,
+        "nationality": driver.nationality,
+        "date_of_birth": driver.date_of_birth,
+        "team_id": driver.team_id,
+    }
+
+
+# helper turns an application row into a dictionary
+def application_to_dict(application):
+    return {
+        "application_id": application.application_id,
+        "driver_id": application.driver_id,
+        "team_id": application.team_id,
+        "status": application.status,
+        "message": application.message,
+        "applied_at": application.applied_at,
+        "reviewed_at": application.reviewed_at,
+    }
+
+
 
 
 # samhita functions (E11 - E15)
