@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
-import functions
-from validation import DriverCreate, TeamApplicationCreate, ApplicationDecision, TeamRegisterRequest
+import function
+from validation import DriverCreate, TeamApplicationCreate, ApplicationDecision, TeamRegisterRequest, RegisterRequest, LoginRequest, OrganizerCreate, TeamCreate,ChampionshipCreate,RaceCreate, RaceResultsSubmit
+
 
 app = FastAPI()
 ROLE = ["admin", "organizer", "driver"]
@@ -28,7 +29,7 @@ def check_error(result, codes):
 # A1 register endpoint
 @app.post("/register")
 def register_user(creds: RegisterRequest):
-    if function.register_user(username=creds.username, password=creds.password, role="driver"):
+    if function.register_user(username=creds.username, password=creds.password, role=creds.role ):
         return {"message": "user registered successfully"}
     raise HTTPException(status_code=409, detail="user already exists")
 
@@ -53,35 +54,43 @@ def refresh(refresh_token: str = Header(None)):
 
 #E1 - E5
 #E1 : create organizer account
-@app.post("/organizer_account")
-def create_organizer_account (account:OrganizerCreate):
-    return function.create_organizer_account(username=account.username, password=account.password)
+@app.post("/organizer_account", status_code=201)
+def create_organizer_account (account:OrganizerCreate, token: str = Header(None)):
+    user = authorize(token, ["admin"])
+    result = function.create_organizer_account(username=account.username, password=account.password)
+    if result == False :
+        raise HTTPException(status_code=409, detail="username already exists")
+    return result
     
-    
-#E2 : create racing team
+#E2 create racing team
 @app.post("/racing_team")
-def create_racing_team (race: TeamCreate):
+def create_racing_team (race: TeamCreate, token: str = Header(None)):
+    user = authorize(token, ["admin"])
     return function.create_racing_team( name=race.name , country = race.country , manager_id = race.manager_id , max_drivers = race.max_drivers)
 
 #E3 :get racing_team
 @app.get("/racing_team")
-def get_racing_team():
+def get_racing_team(token: str = Header(None)):
+    user = authorize(token, ROLE)
     return function.get_racing_team()
 
 #E4 : get racing team through id
 @app.get("/racing_team/{team_id}")
-def get_racing_team_by_id (team_id : int):
+def get_racing_team_by_id (team_id : int, token: str = Header(None)):
+    user = authorize(token, ROLE)
     return function.get_racing_team_by_id(team_id=team_id)
 
+#E5 : create a championship
 @app.post("/Championship")
-def Championship (account:ChampionshipCreate, organizer_id: int = Header()):
-    return function.create_championship( name= account.name, season= account.season, organizer_id = organizer_id, start_date = account.start_date, end_date = account.end_date)
+def Championship (account:ChampionshipCreate, token: str = Header(None)):
+    user = authorize(token, ["organizer"])
+    return function.create_championship( name= account.name, season= account.season, organizer_id = user["user_id"], start_date = account.start_date, end_date = account.end_date)
 
 #E6 - E10
 # E6 gets all championships
 @app.get("/championships")
 def list_championships():
-    return functions.get_championships()
+    return function.get_championships()
 
 
 # E7 registers a driver profile (driver only)

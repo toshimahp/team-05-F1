@@ -23,9 +23,14 @@ REFRESH_TOKEN_EXPIRY = 7 * 24 * 60
 #E1 :function for creation of organizer acount
 def create_organizer_account( username , password ):
     session = Session (engine)
+    existing = session.query(User).filter(User.username == username).first()
+    if existing is not None:
+        session.close()
+        return False
+
     organizer_account = User (
         username = username,
-        password  = password,
+        password  = ph.hash(password),
         role = "organizer" ,
         created_at = datetime.now()
     )
@@ -36,7 +41,6 @@ def create_organizer_account( username , password ):
     data = {
         "user_id" : organizer_account.user_id,
         "username" : organizer_account.username,
-        "password"  : organizer_account.password,
         "role" : organizer_account.role ,
         "created_at" : organizer_account.created_at
     }
