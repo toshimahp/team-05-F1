@@ -17,7 +17,7 @@ A backend for managing a Formula 1-style championship. Admins create organizers 
 |:--------------|:---------|:----------|:----------|:----------|:----------|:-----------|
 | **Toshimah** | | | | | | |
 | **Samhita** | A2 ✅ | E11 ✅ | E12 ✅ | E13 ✅ | E14 ✅ | E15 ✅ |
-| **Darsh** | | | | | | |
+| **Darsh** | A3 ✅ | E6 ✅ | E7 ✅ | E8 ✅ | E9 ✅ | E10 ✅ |
 
 ## 2. Live app
 
