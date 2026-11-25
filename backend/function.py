@@ -11,7 +11,7 @@ from validation import POINTS_TABLE
 
 
 ph = PasswordHasher()
-DB_URL = os.getenv("DB_URL", "sqlite:////app/data/F1.db")
+DB_URL = os.getenv("DB_URL", "sqlite:///F1.db")
 engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
 
@@ -333,7 +333,7 @@ def register_team_for_championship(user_id, championship_id, team_id):
 
 
 
-# samhita functions (E11 - E15)
+# samhita function (E11 - E15)
 # helper func turns a race row into a dictionary
 def race_to_dict(race):
     return {
