@@ -1,11 +1,14 @@
 from sqlalchemy import create_engine
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
-from model import Base, Feedback , User
+from model import Base, User
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 import os
+from model import Championship, ChampionshipTeam, Driver, Race, RaceResult, Team, TeamApplication
+from validation import POINTS_TABLE
+
 
 ph = PasswordHasher()
 
@@ -14,14 +17,14 @@ engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
 
 
-def create_organizer_account( user_id , username , password ):
+#E1 :function for creation of organizer acount
+def create_organizer_account( username , password ):
     session = Session (engine)
     organizer_account = User (
-        user_id = user_id,
         username = username,
         password  = password,
         role = "organizer" ,
-        created_at = datetime.date
+        created_at = datetime.now()
     )
     
     session.add (organizer_account)
@@ -36,6 +39,5 @@ def create_organizer_account( user_id , username , password ):
     }
     session.close()
     return data
-
 
     
