@@ -17,6 +17,7 @@ engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
 
 
+#E1 :function for creation of organizer acount
 def create_organizer_account( user_id , username , password ):
     session = Session (engine)
     organizer_account = User (
@@ -24,7 +25,7 @@ def create_organizer_account( user_id , username , password ):
         username = username,
         password  = password,
         role = "organizer" ,
-        created_at = datetime.now(timezone.utc)
+        created_at = datetime.now()
     )
     
     session.add (organizer_account)
@@ -40,7 +41,103 @@ def create_organizer_account( user_id , username , password ):
     session.close()
     return data
 
-#1 - E5
+#E2 : function for creation of racing team
+def create_racing_team( team_id , name , country,manager_id, max_deivers ):
+    session = Session (engine)
+    racing_team = Team (
+        team_id = team_id,
+        name = name,
+        country = country,
+        manager_id = manager_id ,
+        max_drivers = max_deivers,
+        created_at = datetime.now()
+    )
+    
+    session.add (racing_team)
+    session.commit()
+    
+    data = {
+        "team_id" : team_id,
+        "name" : name,
+        "country" : country,
+        "manager_id" : manager_id ,
+        "max_drivers" : max_deivers,
+        "created_at" : datetime.date
+    }
+    session.close()
+    return data
+
+   
+#E3 : geting all racing team
+def get_racing_team ():
+    session = Session(engine)
+    racing_team = session.query(Team).all()
+    
+    data = []
+    for race_team in racing_team:
+        data.append ({
+            "team_id" : race_team.team_id,
+            "name" : race_team.name,
+            "country" : race_team.country,
+            "manager_id" : race_team.manager_id ,
+            "max_drivers" : race_team.max_deivers,
+            "created_at" : race_team.created_at
+        })
+        
+    session.close()
+    return data
+
+
+#E4 : geting details of particular team through team_id
+def get_racing_team_by_id (team_id):
+    session = Session(engine)
+    racing_team = session.query(Team).filter(Team.team_id == team_id).all()
+    
+    data = []
+    for race_team in racing_team:
+        data.append ({
+            "team_id" : race_team.team_id,
+            "name" : race_team.name,
+            "country" : race_team.country,
+            "manager_id" : race_team.manager_id ,
+            "max_drivers" : race_team.max_deivers,
+            "created_at" : race_team.created_at
+        })
+        
+    session.close()
+    return data
+    
+    
+#E5 : create a championship
+def create_championship(champ_id, name, season, organizer_id, status):
+    session = Session(engine)
+    championship =  Championship(
+            champ_id = champ_id , 
+            name = name,
+            season = season,
+            organizer_id = organizer_id, 
+            start_date = datetime.date,
+            end_date = datetime.date,
+            status = status , # upcoming / ongoing / completed
+            created_at = datetime.now()
+        )
+        
+    session.add (championship)
+    session.commit()
+    
+    data = {
+        "champ_id" : championship.champ_id , 
+        "name" : championship.name,
+        "season" :  championship.season,
+        "organizer_id" : championship.organizer_id, 
+        "start_date" : championship.start_date,
+        "end_date" : championship.end_date, 
+        "status" : championship.status , # upcoming / ongoing / completed
+        "created_at" : championship.creates_at
+    }
+    session.close()
+    return data
+
 
 
 # E6 - E10
