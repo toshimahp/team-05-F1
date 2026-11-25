@@ -91,6 +91,114 @@ def get_championships():
     session.close()
     return result
 
+# E7 registers a driver profile for the logged in user
+def register_driver(user_id, full_name, car_number, nationality, date_of_birth=None):
+    session = Session(engine)
+    for row in session.query(Driver):
+        if row.user_id == user_id:
+            session.close()
+            return "driver profile already exists"
+        if row.car_number == car_number:
+            session.close()
+            return "car number already taken"
+
+    driver = Driver(
+        user_id=user_id,
+        full_name=full_name,
+        car_number=car_number,
+        nationality=nationality,
+        date_of_birth=date_of_birth,
+    )
+    session.add(driver)
+    session.commit()
+    data = driver_to_dict(driver)
+    session.close()
+    return data
+
+
+# E8 the logged in driver applies to join a team
+def apply_to_team(user_id, team_id, message=None):
+    session = Session(engine)
+
+    # finds the driver profile of this user
+    driver = None
+    for row in session.query(Driver):
+        if row.user_id == user_id:
+            driver = row
+    if driver is None:
+        session.close()
+        return "driver profile not found"
+
+    team = session.get(Team, team_id)
+    if team is None:
+        session.close()
+        return "team not found"
+
+    if driver.team_id is not None:
+        session.close()
+        return "driver is already in a team"
+
+    for row in session.query(TeamApplication):
+        if row.driver_id == driver.driver_id and row.team_id == team_id and row.status == "pending":
+            session.close()
+            return "already applied to this team"
+
+    application = TeamApplication(
+        driver_id=driver.driver_id,
+        team_id=team_id,
+        message=message,
+        status="pending",
+    )
+    session.add(application)
+    session.commit()
+    data = application_to_dict(application)
+    session.close()
+    return data
+
+
+# E9 the team manager accepts or rejects an application (status is "accepted" or "rejected")
+def decide_application(user_id, application_id, status):
+    session = Session(engine)
+
+    application = session.get(TeamApplication, application_id)
+    if application is None:
+        session.close()
+        return "application not found"
+
+    team = session.get(Team, application.team_id)
+    if team.manager_id != user_id:
+        session.close()
+        return "not your team"
+
+    if application.status != "pending":
+        session.close()
+        return "application already decided"
+
+    if status == "accepted":
+        driver = session.get(Driver, application.driver_id)
+        if driver.team_id is not None:
+            session.close()
+            return "driver is already in a team"
+
+        # counts the drivers already in this team
+        count = 0
+        for row in session.query(Driver):
+            if row.team_id == team.team_id:
+                count = count + 1
+        if count >= team.max_drivers:
+            session.close()
+            return "team is full"
+
+        driver.team_id = team.team_id
+
+    application.status = status
+    application.reviewed_at = datetime.now()
+    session.commit()
+    data = application_to_dict(application)
+    session.close()
+    return data
+
+
 
 
 
