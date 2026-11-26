@@ -27,6 +27,13 @@ class RegisterRequest(BaseModel):
         if len(v) < 5:
             raise ValueError("password must be at least 5 characters")
         return v
+    
+    @field_validator("role")
+    def check_role(cls, v):
+        v = v.strip().lower()
+        if v not in ["admin", "organizer", "driver", "team_manager"]:
+            raise ValueError("role must be admin, organizer, driver or team_manager")
+        return v
 
 # admin + teams 
 class OrganizerCreate(BaseModel):

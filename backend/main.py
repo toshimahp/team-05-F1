@@ -122,7 +122,7 @@ def apply_for_team(creds: TeamApplicationCreate, token: str = Header(None)):
 # E9 the team manager accepts or rejects an application
 @app.patch("/applications/{application_id}")
 def decide_on_application(application_id: int, creds: ApplicationDecision, token: str = Header(None)):
-    user = authorize(token, ["team_manager"])
+    user = authorize(token, ["team_manager", "admin"])
     result = function.decide_application(user["user_id"], application_id, creds.status)
     check_error(result, {
         "application not found": 404,
