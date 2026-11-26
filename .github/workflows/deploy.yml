@@ -68,7 +68,8 @@ jobs:
             sudo systemctl enable --now docker
             sudo usermod -aG docker $USER
             sudo docker pull ${{ env.IMAGE }}:${{ env.VERSION }}
-            sudo docker rm -f todo-list || true
-            sudo docker run -d --name todo-list --restart unless-stopped -p 8000:8000 ${{ env.IMAGE }}:${{ env.VERSION }}
+            sudo docker rm -f team-05-f1 todo-list || true
+            mkdir -p $HOME/f1-data
+            sudo docker run -d --name team-05-f1 --restart unless-stopped -p 8001:8001 -v $HOME/f1-data:/app/data -e DB_URL=sqlite:////app/data/F1.db ${{ env.IMAGE }}:${{ env.VERSION }} uvicorn main:app --host 0.0.0.0 --port 8001
             sudo docker image prune -af
-            sudo docker ps --filter name=todo-list
+            sudo docker ps --filter name=team-05-f1
