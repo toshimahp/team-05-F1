@@ -14,7 +14,9 @@ ph = PasswordHasher()
 DB_URL = os.getenv("DB_URL", "sqlite:///F1.db")
 engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    SECRET_KEY = "DUMMY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRY = 15
 REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 
