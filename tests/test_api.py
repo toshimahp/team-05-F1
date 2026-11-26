@@ -1,6 +1,6 @@
 import requests
 
-URL = "http://54.221.66.61:8001/docs"
+URL = "http://127.0.0.1:8001"
 
 tokens = {}
 refresh_tokens = {}

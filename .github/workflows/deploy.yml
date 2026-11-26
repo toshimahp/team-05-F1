@@ -22,7 +22,6 @@ jobs:
           working-directory: backend
           env:
             DB_URL: sqlite:///../tests/test.db
-            SECRET_KEY: ${{ secrets.SECRET_KEY }}
           run: |
             rm -f ../tests/test.db
             nohup python -m uvicorn main:app --port 8001 > server.log 2>&1 &
@@ -31,12 +30,6 @@ jobs:
         - name: Run tests
           working-directory: tests
           run: python -m pytest -v
-
-        - name: Debug the server
-          if: failure()
-          run: |
-            cat backend/server.log
-            curl -s http://127.0.0.1:8001/openapi.json || true
   build-push-deploy:
     needs: test
     runs-on: ubuntu-latest

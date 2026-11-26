@@ -14,12 +14,10 @@ ph = PasswordHasher()
 DB_URL = os.getenv("DB_URL", "sqlite:///F1.db")
 engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY is not set")
+SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRY = 15
-REFRESH_TOKEN_EXPIRY = 7 * 24 * 60
+REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 
 
 def register_user(username, password, role):
     session = Session(engine)
