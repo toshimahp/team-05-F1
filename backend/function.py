@@ -37,7 +37,7 @@ def register_user(username, password, role):
     session.close()
     return True
 
-#E1 :function for creation of organizer acount
+#E1 :function for creation of organizer acount (admin only)
 def create_organizer_account( username , password ):
     session = Session (engine)
     existing = session.query(User).filter(User.username == username).first()
@@ -64,7 +64,7 @@ def create_organizer_account( username , password ):
     session.close()
     return data
 
-#E2 : function for creation of racing team
+#E2 : function for creation of racing team (admin only)
 def create_racing_team( name , country,manager_id, max_drivers ):
     session = Session (engine)
     racing_team = Team (
@@ -90,7 +90,7 @@ def create_racing_team( name , country,manager_id, max_drivers ):
     return data
 
    
-#E3 : geting all racing team
+#E3 : geting all racing team (all)
 def get_racing_team ():
     session = Session(engine)
     racing_team = session.query(Team).all()
@@ -209,7 +209,7 @@ def get_championships():
     session.close()
     return result
 
-# E7 registers a driver profile for the logged in user
+# E7 registers a driver profile for the logged in user (driver only)
 def register_driver(user_id, full_name, car_number, nationality, date_of_birth=None):
     session = Session(engine)
     for row in session.query(Driver):
@@ -234,7 +234,7 @@ def register_driver(user_id, full_name, car_number, nationality, date_of_birth=N
     return data
 
 
-# E8 the logged in driver applies to join a team
+# E8 the logged in driver applies to join a team (driver only)
 def apply_to_team(user_id, team_id, message=None):
     session = Session(engine)
 
@@ -274,7 +274,7 @@ def apply_to_team(user_id, team_id, message=None):
     return data
 
 
-# E9 the team manager accepts or rejects an application (status is "accepted" or "rejected")
+# E9 the team manager accepts or rejects an application (status is "accepted" or "rejected") (manager only)
 def decide_application(user_id, application_id, status):
     session = Session(engine)
 
@@ -317,7 +317,7 @@ def decide_application(user_id, application_id, status):
     return data
 
 
-# E10 the team manager registers a team for a championship
+# E10 the team manager registers a team for a championship  (manager only)
 def register_team_for_championship(user_id, championship_id, team_id):
     session = Session(engine)
 

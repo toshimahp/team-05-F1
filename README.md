@@ -119,6 +119,67 @@ One SQLite file with these tables. The columns below are the plan, so update the
 
 ## 6. Screenshots
 
+### Authentication
+
+**A1: Register a new account**<br>
+[View screenshot](screenshots/a1-register.png)
+
+**A2: Log in and get access and refresh tokens**<br>
+[View screenshot](screenshots/a2-login.png)
+
+**A3: Get a new access token using the refresh token**<br>
+[View screenshot](screenshots/a3-refresh.png)
+
+### Organizers, teams and championships
+
+**E1: Admin creates an organizer account**<br>
+[View screenshot](screenshots/e1-create_organizer_account.png)
+
+**E2: Admin creates a racing team**<br>
+[View screenshot](screenshots/e2-create_racing_team.png)
+
+**E3: Get all racing teams**<br>
+[View screenshot](screenshots/e3-get_racing_team.png)
+
+**E4: Get one team by its ID**<br>
+[View screenshot](screenshots/e4-get-raging_team_id.png)
+
+**E5: Organizer creates a championship**<br>
+[View screenshot](screenshots/e5-reate_championship.png)
+
+**E6: Get all championships**<br>
+[View screenshot](screenshots/e6-get_all_championships.png)
+
+### Drivers and applications
+
+**E7: Driver registers a driver profile**<br>
+[View screenshot](screenshots/e7-create_driver.png)
+
+**E8: Driver applies to join a team**<br>
+[View screenshot](screenshots/e8-driver%20applies_to_join_a_team.png)
+
+**E9: Team manager accepts or rejects an application**<br>
+[View screenshot](screenshots/e9-team_manager_accepts_or_rejects_an_application.png)
+
+**E10: Team manager registers a team for a championship**<br>
+[View screenshot](screenshots/e10-team_manager_registers_a_team_for_a_championship.png)
+
+### Races, results and standings
+
+**E11: Organizer schedules a race in a championship**<br>
+[View screenshot](screenshots/e11-schedule-race.png)
+
+**E12: Get the races for a championship**<br>
+[View screenshot](screenshots/e12-get-championship.png)
+
+**E13: Organizer submits race results**<br>
+[View screenshot](screenshots/e13-publish-race-results.png)
+
+**E14: Get championship standings**<br>
+[View screenshot](screenshots/e14-get-championship-standings.png)
+
+**E15: Get a driver's performance history**<br>
+[View screenshot](screenshots/e15-get-driver-history.png)
 
 
 ## 7. Known issues
