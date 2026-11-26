@@ -19,23 +19,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRY = 15
 REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 
 
-def register_user(username, password, role):
-    session = Session(engine)
-    user_exist = session.query(User).filter_by(username =username).first()
-    if user_exist is not None:
-        session.close()
-        return False
-    
-    try:
-        hashed_password = ph.hash(password)
-    except Exception:
-        session.close()
-        return False
-    
-    session.add(User(username= username, password= hashed_password, role= role))
-    session.commit()
-    session.close()
-    return True
 
 #E1 :function for creation of organizer acount (admin only)
 def create_organizer_account( username , password ):

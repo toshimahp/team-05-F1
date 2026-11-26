@@ -4,7 +4,7 @@
 
 A backend for managing a Formula 1-style championship. Admins create organizers and teams, organizers create championships, schedule races and publish results, and users register as drivers, apply to teams and race. Championship standings are calculated from the published results. Built with FastAPI, SQLite, Pydantic, JWT access and refresh tokens and role-based access control, and deployed with Docker, GitHub Actions and AWS EC2. This is a backend-only project, so there is no frontend.
 
-**Roles:** `admin`, `organizer` and `driver`. New registrations are drivers by default, and only admins can create organizer accounts.
+**Roles:** `admin`, `organizer`, `driver`  and `team_manager`. New registrations are drivers by default, and only admins can create organizer accounts.
 
 | Member | Endpoints built |
 |:-------|:----------------|
@@ -184,3 +184,11 @@ One SQLite file with these tables. The columns below are the plan, so update the
 
 ## 7. Known issues
 
+| # | Known issue | Proposed fix |
+|:--:|:-------------|:-------------|
+| 1 | Anyone can register as an admin or organizer. | Remove admin and organizer from public registration. Seed the initial admin account securely. |
+| 2 | A fallback `SECRET_KEY` is hardcoded, and deployment does not override it. | Require `SECRET_KEY` as an environment variable and pass the GitHub secret to `docker run`. |
+| 3 | Creating a team with a duplicate name returns HTTP `500`. | Check for an existing team name and return HTTP `409 Conflict`. |
+| 4 | E4 returns HTTP `200` with an empty list (`[]`) for a non-existent team. | Return HTTP `404 Not Found` if the team does not exist. |
+| 5 | E9 allows admins through the route, but the ownership check returns `403 Forbidden` (`"not your team"`). | Remove admin from the allowed roles or let admins bypass the ownership check. |
+| 6 | E7 (`create_driver`) does not expose `team_id` in the request body, so it always remains `null`. | Change the `team_id` column in the drivers table of`model.py` to `nullable=False`. |
