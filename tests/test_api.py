@@ -317,7 +317,12 @@ def test_e8_unknown_team():
 
 
 def test_e8_without_driver_profile():
-    response = requests.post(url=URL + "/applications", json={"team_id": 1}, headers=auth("mgr1"))
+    # dan is a driver who never created a driver profile
+    requests.post(url=URL + "/register", json={"username": "dan", "password": "pass123", "role": "driver"})
+    login = requests.post(url=URL + "/auth/login", json={"username": "dan", "password": "pass123"})
+    tokens["dan"] = login.json()["access_token"]
+
+    response = requests.post(url=URL + "/applications", json={"team_id": 1}, headers=auth("dan"))
     assert response.status_code == 404
 
 
