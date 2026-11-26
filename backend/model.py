@@ -10,7 +10,7 @@ class User(Base):
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
     password = Column(String, nullable=False)
-    role = Column(String, nullable=False, default="driver")  # admin / organizer / driver
+    role = Column(String, nullable=False, default="admin")  # admin / organizer / driver
     created_at = Column(DateTime, default=datetime.now)
 
 
