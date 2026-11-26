@@ -66,8 +66,12 @@ def create_organizer_account (account:OrganizerCreate, token: str = Header(None)
 @app.post("/racing_team")
 def create_racing_team (race: TeamCreate, token: str = Header(None)):
     user = authorize(token, ["admin"])
-    return function.create_racing_team( name=race.name , country = race.country , manager_id = race.manager_id , max_drivers = race.max_drivers)
-
+    result= function.create_racing_team( name=race.name , country = race.country , manager_id = race.manager_id , max_drivers = race.max_drivers)
+    check_error(result, {"manager not found": 404,
+        "user is not a team manager": 400,
+    })
+    return result
+    
 #E3 :get racing_team
 @app.get("/racing_team")
 def get_racing_team(token: str = Header(None)):
