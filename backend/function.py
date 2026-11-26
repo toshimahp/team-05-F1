@@ -64,9 +64,18 @@ def create_organizer_account( username , password ):
     session.close()
     return data
 
-#E2 : function for creation of racing team (admin only)
 def create_racing_team( name , country,manager_id, max_drivers ):
     session = Session (engine)
+    
+    # checks that the manager exists and is a team manager
+    manager = session.query(User).filter(User.user_id == manager_id).first()
+    if manager is None:
+        session.close()
+        return "manager not found"
+    if manager.role != "team_manager":
+        session.close()
+        return "user is not a team manager"
+
     racing_team = Team (
         name = name,
         country = country,
