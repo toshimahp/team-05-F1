@@ -5,7 +5,7 @@ from validation import DriverCreate, TeamApplicationCreate, ApplicationDecision,
 
 
 app = FastAPI()
-ROLE = ["admin", "organizer", "driver"]
+ROLE = ["admin", "organizer", "driver", "team_manager"]
 
 
 # checks the access token and returns what is inside it
@@ -122,7 +122,7 @@ def apply_for_team(creds: TeamApplicationCreate, token: str = Header(None)):
 # E9 the team manager accepts or rejects an application
 @app.patch("/applications/{application_id}")
 def decide_on_application(application_id: int, creds: ApplicationDecision, token: str = Header(None)):
-    user = authorize(token, ROLE)
+    user = authorize(token, ["team_manager"])
     result = function.decide_application(user["user_id"], application_id, creds.status)
     check_error(result, {
         "application not found": 404,
@@ -136,7 +136,7 @@ def decide_on_application(application_id: int, creds: ApplicationDecision, token
 # E10 the team manager registers a team for a championship
 @app.post("/championships/{championship_id}/teams", status_code=201)
 def register_team_in_championship(championship_id: int, creds: TeamRegisterRequest, token: str = Header(None)):
-    user = authorize(token, ROLE)
+    user = authorize(token, ["team_manager"])
     result = function.register_team_for_championship(user["user_id"], championship_id, creds.team_id)
     check_error(result, {
         "championship not found": 404,
