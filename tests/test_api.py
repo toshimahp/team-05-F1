@@ -20,7 +20,7 @@ def test_setup_register_users():
     users = [
         {"username": "admin1", "password": "pass123", "role": "admin"},
         {"username": "org1", "password": "pass123", "role": "organizer"},
-        {"username": "mgr1", "password": "pass123", "role": "driver"},
+        {"username": "mgr1", "password": "pass123", "role": "team_manager"},
         {"username": "ana", "password": "pass123", "role": "driver"},
         {"username": "ben", "password": "pass123", "role": "driver"},
         {"username": "cal", "password": "pass123", "role": "driver"},
