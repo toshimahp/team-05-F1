@@ -21,8 +21,8 @@ A backend for managing a Formula 1-style championship. Admins create organizers 
 
 ## 2. Live app
 
-**Public API link:** 
-**API docs:** 
+**Public API link:** http://54.221.66.61:8001/docs
+**API docs:** http://127.0.0.1:8001/docs
 
 ## 3. How to run it
 
